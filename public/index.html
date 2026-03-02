@@ -85,6 +85,7 @@
         background-color: #f8fafc;
         color: #0f172a;
         overflow-x: hidden;
+        transition: background-color 0.3s ease, color 0.3s ease;
       }
       h1, h2, h3, h4, h5, h6 {
         font-family: 'Space Grotesk', sans-serif;
@@ -140,7 +141,177 @@
         opacity: 1;
         animation: scan 2s linear infinite;
       }
+
+      /* ── Dark mode overrides ──────────────────────────── */
+      html.dark body {
+        background-color: #0f172a;
+        color: #e2e8f0;
+      }
+      html.dark .glass-card {
+        background: rgba(30, 41, 59, 0.75);
+        border-color: rgba(148, 163, 184, 0.12);
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3);
+      }
+      html.dark .glass-card:hover {
+        background: rgba(51, 65, 85, 0.9);
+      }
+      html.dark .bg-grid-slate {
+        background-image: linear-gradient(to right, rgba(148,163,184,0.05) 1px, transparent 1px),
+                          linear-gradient(to bottom, rgba(148,163,184,0.05) 1px, transparent 1px);
+      }
+      html.dark .text-gradient {
+        background: linear-gradient(135deg, #60a5fa 0%, #22d3ee 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      /* Light backgrounds → dark */
+      html.dark [class~="bg-white"]       { background-color: #1e293b !important; }
+      html.dark [class~="bg-slate-50"]    { background-color: #1e293b !important; }
+      html.dark [class~="bg-slate-100"]   { background-color: #1e293b !important; }
+      html.dark [class~="bg-slate-200"]   { background-color: #334155 !important; }
+      html.dark [class~="bg-blue-50"]     { background-color: #172554 !important; }
+      html.dark [class~="bg-indigo-50"]   { background-color: #1e1b4b !important; }
+      html.dark [class~="bg-purple-50"]   { background-color: #2e1065 !important; }
+      html.dark [class~="bg-green-50"]    { background-color: #052e16 !important; }
+      html.dark [class~="bg-orange-50"]   { background-color: #431407 !important; }
+      html.dark [class~="bg-red-50"]      { background-color: #450a0a !important; }
+      /* Dark text → light */
+      html.dark [class~="text-slate-900"] { color: #f1f5f9 !important; }
+      html.dark [class~="text-slate-800"] { color: #e2e8f0 !important; }
+      html.dark [class~="text-slate-700"] { color: #cbd5e1 !important; }
+      html.dark [class~="text-slate-600"] { color: #94a3b8 !important; }
+      html.dark [class~="text-slate-500"] { color: #64748b !important; }
+      /* Borders */
+      html.dark [class~="border-slate-100"] { border-color: #334155 !important; }
+      html.dark [class~="border-slate-200"] { border-color: #475569 !important; }
+      html.dark [class~="border-blue-100"]  { border-color: #1e3a8a !important; }
+      /* Navbar */
+      html.dark nav {
+        background: rgba(15, 23, 42, 0.95) !important;
+        border-color: rgba(148, 163, 184, 0.1) !important;
+      }
+      /* Inputs */
+      html.dark input, html.dark textarea, html.dark select {
+        background-color: #1e293b !important;
+        color: #e2e8f0 !important;
+        border-color: #475569 !important;
+      }
+      html.dark input::placeholder, html.dark textarea::placeholder {
+        color: #64748b !important;
+      }
+
+      /* ── Theme toggle button ─────────────────────────── */
+      #theme-toggle {
+        position: fixed;
+        top: 14px;
+        right: 16px;
+        z-index: 99999;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 1.5px solid rgba(99, 102, 241, 0.35);
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        cursor: pointer;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+        transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.3s ease;
+        outline: none;
+      }
+      #theme-toggle:hover {
+        transform: scale(1.12);
+        box-shadow: 0 4px 20px rgba(99, 102, 241, 0.35);
+      }
+      html.dark #theme-toggle {
+        background: rgba(30, 41, 59, 0.92);
+        border-color: rgba(148, 163, 184, 0.25);
+        box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+      }
+      #theme-toggle .t-icon { line-height: 1; pointer-events: none; }
+      /* tiny mode indicator dot */
+      #theme-toggle::after {
+        content: attr(data-mode);
+        position: absolute;
+        bottom: -6px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 9px;
+        font-family: 'Outfit', sans-serif;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+        color: #6366f1;
+        background: white;
+        border-radius: 4px;
+        padding: 0 3px;
+        opacity: 0;
+        transition: opacity 0.2s;
+        white-space: nowrap;
+      }
+      html.dark #theme-toggle::after { background: #1e293b; color: #a5b4fc; }
+      #theme-toggle:hover::after { opacity: 1; }
     </style>
+
+  <!-- Dark mode: apply before first paint to avoid flash -->
+  <script>
+    (function () {
+      var STORAGE_KEY = 'bls-theme';
+      var html = document.documentElement;
+
+      function getEffective(pref) {
+        if (pref === 'dark') return 'dark';
+        if (pref === 'light') return 'light';
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+
+      function applyPref(pref) {
+        var effective = getEffective(pref);
+        html.classList.toggle('dark', effective === 'dark');
+        var btn = document.getElementById('theme-toggle');
+        if (btn) {
+          btn.querySelector('.t-icon').textContent = effective === 'dark' ? '☀️' : '🌙';
+          btn.setAttribute('data-mode', pref === 'system' ? 'auto' : pref);
+          btn.title = pref === 'system'
+            ? 'Auto (system). Click for dark'
+            : pref === 'dark'
+            ? 'Dark mode. Click for light'
+            : 'Light mode. Click for auto';
+        }
+      }
+
+      // Apply immediately (prevents flash)
+      var saved = localStorage.getItem(STORAGE_KEY) || 'system';
+      applyPref(saved);
+
+      // React to OS changes when on 'system'
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
+        if ((localStorage.getItem(STORAGE_KEY) || 'system') === 'system') applyPref('system');
+      });
+
+      // Inject button after DOM is ready
+      document.addEventListener('DOMContentLoaded', function () {
+        var btn = document.createElement('button');
+        btn.id = 'theme-toggle';
+        btn.setAttribute('aria-label', 'Toggle colour theme');
+        var icon = document.createElement('span');
+        icon.className = 't-icon';
+        btn.appendChild(icon);
+        document.body.appendChild(btn);
+        applyPref(localStorage.getItem(STORAGE_KEY) || 'system');
+
+        btn.addEventListener('click', function () {
+          // Cycle: system → dark → light → system
+          var cur = localStorage.getItem(STORAGE_KEY) || 'system';
+          var next = cur === 'system' ? 'dark' : cur === 'dark' ? 'light' : 'system';
+          localStorage.setItem(STORAGE_KEY, next);
+          applyPref(next);
+        });
+      });
+    })();
+  </script>
 
   <script type="importmap">
 {
