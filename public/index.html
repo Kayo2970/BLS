@@ -522,6 +522,33 @@
         }
       }
 
+      /* ── Nav: always-visible logo ─────────────────────── */
+      /*
+       * React hides the logo when the user hasn't scrolled:
+       *   - outer div gets class  "overflow-hidden flex-shrink-0 mr-6"
+       *   - inner div gets        "opacity-0 -translate-x-10 w-0"
+       *   - the <img> is not even rendered (s && <img>)
+       *
+       * Fix: force the inner logo div to always be 40×40px and opaque.
+       * Use background-image so the logo shows even before React renders
+       * the <img> node. Once React renders the img (after first scroll),
+       * it sits on top of the background — same image, no flicker.
+       */
+      nav div.overflow-hidden.flex-shrink-0 > a > div,
+      nav div.overflow-hidden.flex-shrink-0 > a > div[class*="opacity-0"],
+      nav div.overflow-hidden.flex-shrink-0 > a > div[class*="w-0"] {
+        opacity:    1 !important;
+        transform:  none !important;
+        width:      2.5rem !important;   /* w-10 = 40px */
+        height:     2.5rem !important;   /* h-10 = 40px */
+        /* Show logo via background so it appears before React renders <img> */
+        background-image:    url('/images/core/logo.png') !important;
+        background-size:     contain !important;
+        background-repeat:   no-repeat !important;
+        background-position: center !important;
+        flex-shrink: 0;
+      }
+
       /* ── Nav responsive fixes (all sizes) ─────────────── */
       /* Prevent nav pill overflowing viewport */
       nav > div {
