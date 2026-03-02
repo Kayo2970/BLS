@@ -35,6 +35,9 @@
       tailwind.config = {
         theme: {
           extend: {
+            screens: {
+              'xs': '475px',   /* enables xs: prefix used throughout the app */
+            },
             colors: {
               brand: {
                 50: '#eff6ff',
@@ -354,6 +357,198 @@
       }
       html.dark #theme-toggle::after { background: #1e293b; color: #a5b4fc; }
       #theme-toggle:hover::after { opacity: 1; }
+
+      /* ══════════════════════════════════════════════════
+         RESPONSIVE OVERRIDES
+         ══════════════════════════════════════════════════ */
+
+      /* ── Base: smooth font rendering ──────────────────── */
+      * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+      /* ── Mobile first: < 475px (< xs) ─────────────────── */
+      @media (max-width: 474px) {
+        /* Nav pill: no overflow on tiny screens */
+        nav > div > div {
+          padding-left: 0.75rem !important;
+          padding-right: 0.75rem !important;
+        }
+
+        /* Section vertical spacing — py-24 (96px) → 56px */
+        [class~="py-24"] {
+          padding-top: 3.5rem !important;
+          padding-bottom: 3.5rem !important;
+        }
+        [class~="py-20"] {
+          padding-top: 3rem !important;
+          padding-bottom: 3rem !important;
+        }
+        [class~="py-12"] {
+          padding-top: 2rem !important;
+          padding-bottom: 2rem !important;
+        }
+
+        /* Hero heading: keep readable */
+        header#home h1 {
+          font-size: clamp(2rem, 10vw, 2.75rem) !important;
+          line-height: 1.1 !important;
+        }
+
+        /* Countdown: tighten gap so 4 boxes fit */
+        header#home [class*="gap-2"][class*="justify-center"],
+        header#home [class*="gap-3"][class*="justify-center"] {
+          gap: 0.35rem !important;
+        }
+
+        /* Gallery: single column on very small phones */
+        [class*="grid-cols-2"]:not([class*="md:"]):not([class*="lg:"]) {
+          grid-template-columns: 1fr !important;
+        }
+
+        /* Partner logos: 2 cols on tiny screens */
+        [class*="grid-cols-3"]:not([class*="md:"]):not([class*="lg:"]) {
+          grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        }
+
+        /* Speaker / committee card images: scale down */
+        .relative.w-28.h-28 { width: 5rem !important; height: 5rem !important; }
+        .relative.w-20.h-20 { width: 4rem !important; height: 4rem !important; }
+
+        /* Footer social icons: wrap nicely */
+        footer .flex.gap-4.flex-wrap { justify-content: center; }
+      }
+
+      /* ── Small phones + large phones: < 640px (< sm) ──── */
+      @media (max-width: 639px) {
+        /* Reduce section padding across all sections */
+        [class~="py-24"] {
+          padding-top: 4rem !important;
+          padding-bottom: 4rem !important;
+        }
+        [class~="py-20"] {
+          padding-top: 3.5rem !important;
+          padding-bottom: 3.5rem !important;
+        }
+
+        /* Section inner horizontal padding */
+        [class~="px-4"] { padding-left: 1rem !important; padding-right: 1rem !important; }
+
+        /* Hero: reduce top padding so content isn't buried */
+        header#home {
+          padding-top: 6rem !important;
+          padding-bottom: 3rem !important;
+        }
+
+        /* CTA buttons: full width on mobile */
+        header#home [class*="flex-wrap"][class*="gap-4"] > a,
+        header#home [class*="flex-wrap"][class*="gap-4"] > div {
+          min-width: 0;
+          flex: 1 1 auto;
+          justify-content: center;
+        }
+
+        /* Stats row: wrap to 2 per row on mobile */
+        header#home [class*="flex-wrap"][class*="gap-4"] {
+          gap: 0.5rem !important;
+        }
+
+        /* Cards: full-width single column on mobile before md: kicks in */
+        [class~="grid"][class~="md:grid-cols-2"]:not([class*="lg:grid-cols"]) {
+          grid-template-columns: 1fr;
+        }
+        [class~="grid"][class~="md:grid-cols-3"] {
+          grid-template-columns: 1fr;
+        }
+
+        /* Footer: single column */
+        footer [class~="grid"] {
+          grid-template-columns: 1fr !important;
+          gap: 2rem !important;
+        }
+
+        /* Reduce mb-16/mb-20 in footer */
+        footer [class~="mb-16"] { margin-bottom: 2rem !important; }
+
+        /* Section titles */
+        [class~="text-4xl"] { font-size: 1.75rem !important; }
+        [class~="text-3xl"] { font-size: 1.5rem !important; }
+      }
+
+      /* ── Tablet: 640px – 767px (sm) ───────────────────── */
+      @media (min-width: 640px) and (max-width: 767px) {
+        [class~="py-24"] {
+          padding-top: 5rem !important;
+          padding-bottom: 5rem !important;
+        }
+        /* 2-column grid for cards that only go 2-col at md */
+        [class~="grid"][class~="md:grid-cols-2"] {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      /* ── Tablet landscape: 768px – 1023px (md) ─────────── */
+      @media (min-width: 768px) and (max-width: 1023px) {
+        /* Speaker grid: 2 columns at tablet, 3 at desktop */
+        [class~="grid"][class~="md:grid-cols-2"][class~="lg:grid-cols-3"] {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        /* Reduce extra-large section padding slightly */
+        [class~="py-24"] {
+          padding-top: 5.5rem !important;
+          padding-bottom: 5.5rem !important;
+        }
+      }
+
+      /* ── Desktop: 1024px – 1279px (lg) ────────────────── */
+      @media (min-width: 1024px) and (max-width: 1279px) {
+        /* Ensure inner content doesn't hug edges */
+        [class~="max-w-7xl"] { padding-left: 2rem; padding-right: 2rem; }
+      }
+
+      /* ── Wide: 1280px – 1535px (xl) ───────────────────── */
+      @media (min-width: 1280px) {
+        /* Slightly increase max container width benefit from more space */
+        [class~="max-w-7xl"] { max-width: 82rem; }
+      }
+
+      /* ── Ultra-wide: ≥ 1536px (2xl) ───────────────────── */
+      @media (min-width: 1536px) {
+        [class~="max-w-7xl"] { max-width: 90rem; }
+        /* Hero heading can go larger */
+        header#home h1 { font-size: clamp(5rem, 7vw, 9rem) !important; }
+        /* Section padding has room to breathe */
+        [class~="py-24"] {
+          padding-top: 8rem !important;
+          padding-bottom: 8rem !important;
+        }
+      }
+
+      /* ── Nav responsive fixes (all sizes) ─────────────── */
+      /* Prevent nav pill overflowing viewport */
+      nav > div {
+        max-width: calc(100vw - 2rem);
+        box-sizing: border-box;
+      }
+      /* Ensure logo text never wraps */
+      nav [class*="tracking-"] { white-space: nowrap; }
+      /* Theme toggle sits correctly at all sizes */
+      #theme-toggle.in-nav { flex-shrink: 0; }
+
+      /* ── Touch targets: min 44px on mobile ────────────── */
+      @media (max-width: 767px) {
+        nav button, nav a {
+          min-height: 44px;
+          min-width: 44px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+        }
+        #theme-toggle { min-height: 44px; min-width: 44px; width: 36px; height: 36px; }
+      }
+
+      /* ── Widescreen image quality ──────────────────────── */
+      @media (min-width: 1280px) {
+        img { image-rendering: auto; }
+      }
     </style>
 
   <!-- Dark mode: apply before first paint to avoid flash -->
@@ -401,25 +596,43 @@
         icon.className = 't-icon';
         btn.appendChild(icon);
 
-        // Try to place the toggle inside the nav's desktop controls area
-        // (the div that directly wraps the /register link — same row as Brochure)
+        // Place toggle in the nav's outermost right-side flex area
+        // (the div that holds both the desktop controls AND the hamburger)
+        // This makes it visible on ALL screen sizes — mobile and desktop.
         function tryPlaceInNav() {
+          // The hamburger button is md:hidden — its parent is the always-visible right flex container
+          var hamburger = document.querySelector('nav [class*="md:hidden"] button, nav button[class*="rounded-lg"]');
+          if (hamburger) {
+            var rightSlot = hamburger.closest('[class*="gap-3"]') || hamburger.parentElement;
+            if (rightSlot && rightSlot !== hamburger) {
+              btn.classList.add('in-nav');
+              // Insert before the hamburger so toggle appears first on mobile
+              rightSlot.insertBefore(btn, hamburger.parentElement && hamburger.parentElement !== rightSlot
+                ? hamburger.parentElement
+                : hamburger);
+              return true;
+            }
+          }
+          // Fallback: register link's grandparent (desktop-only slot)
           var regLink = document.querySelector('nav a[href="/register"]');
-          if (!regLink) return false;
-          var slot = regLink.closest('div');
-          if (!slot) return false;
-          btn.classList.add('in-nav');
-          slot.insertBefore(btn, slot.firstChild);
-          return true;
+          if (regLink) {
+            var slot = regLink.closest('div');
+            if (slot) {
+              btn.classList.add('in-nav');
+              slot.insertBefore(btn, slot.firstChild);
+              return true;
+            }
+          }
+          return false;
         }
 
         if (!tryPlaceInNav()) {
-          // Retry once after a short delay (React may still be mounting)
+          // Retry once after React finishes mounting
           setTimeout(function () {
             if (!tryPlaceInNav()) {
               document.body.appendChild(btn);
             }
-          }, 500);
+          }, 600);
         }
 
         applyPref(localStorage.getItem(STORAGE_KEY) || 'system');
