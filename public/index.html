@@ -142,6 +142,11 @@
         animation: scan 2s linear infinite;
       }
 
+      /* ── Images: show face at top, not cropped center ─── */
+      img.portrait-grayscale {
+        object-position: top center;
+      }
+
       /* ── Dark mode overrides ──────────────────────────── */
       html.dark body {
         background-color: #0f172a;
@@ -164,10 +169,10 @@
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
       }
-      /* Light backgrounds → dark */
-      html.dark [class~="bg-white"]       { background-color: #1e293b !important; }
+      /* Light backgrounds → dark (including opacity variants like bg-white/80, bg-white/95) */
+      html.dark [class*="bg-white"]       { background-color: #1e293b !important; }
       html.dark [class~="bg-slate-50"]    { background-color: #1e293b !important; }
-      html.dark [class~="bg-slate-100"]   { background-color: #1e293b !important; }
+      html.dark [class~="bg-slate-100"]   { background-color: #283548 !important; }
       html.dark [class~="bg-slate-200"]   { background-color: #334155 !important; }
       html.dark [class~="bg-blue-50"]     { background-color: #172554 !important; }
       html.dark [class~="bg-indigo-50"]   { background-color: #1e1b4b !important; }
@@ -185,10 +190,33 @@
       html.dark [class~="border-slate-100"] { border-color: #334155 !important; }
       html.dark [class~="border-slate-200"] { border-color: #475569 !important; }
       html.dark [class~="border-blue-100"]  { border-color: #1e3a8a !important; }
-      /* Navbar */
-      html.dark nav {
-        background: rgba(15, 23, 42, 0.95) !important;
+      /* Countdown boxes: force bg-white/80 container dark + readable text */
+      html.dark [class*="bg-white"][class*="backdrop-blur"] {
+        background-color: rgba(30, 41, 59, 0.9) !important;
+        border-color: rgba(148, 163, 184, 0.15) !important;
+      }
+      /* Nav sub-menu dropdowns and mobile overlay: ensure dark bg */
+      html.dark [class*="bg-white"][class*="backdrop-blur-xl"] {
+        background-color: rgba(15, 23, 42, 0.97) !important;
+        border-color: rgba(148, 163, 184, 0.15) !important;
+      }
+      /* Nav: both scrolled (glass-card) and unscrolled states */
+      html.dark nav > div {
+        background-color: rgba(15, 23, 42, 0.92) !important;
         border-color: rgba(148, 163, 184, 0.1) !important;
+      }
+      /* Nav links text: force readable color */
+      html.dark nav a, html.dark nav button:not(#theme-toggle) {
+        color: #cbd5e1 !important;
+      }
+      html.dark nav a:hover, html.dark nav a[class*="text-blue"] {
+        color: #93c5fd !important;
+      }
+      /* Download Brochure button in mobile nav */
+      html.dark a[class~="border-slate-200"][class~="font-bold"] {
+        background-color: rgba(30, 41, 59, 0.8) !important;
+        color: #e2e8f0 !important;
+        border-color: #475569 !important;
       }
       /* Inputs */
       html.dark input, html.dark textarea, html.dark select {
@@ -202,41 +230,52 @@
 
       /* ── Theme toggle button ─────────────────────────── */
       #theme-toggle {
-        position: fixed;
-        top: 14px;
-        right: 16px;
-        z-index: 99999;
-        width: 40px;
-        height: 40px;
+        flex-shrink: 0;
+        width: 34px;
+        height: 34px;
         border-radius: 50%;
-        border: 1.5px solid rgba(99, 102, 241, 0.35);
-        background: rgba(255, 255, 255, 0.92);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
+        border: 1.5px solid rgba(99, 102, 241, 0.3);
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
         cursor: pointer;
-        font-size: 1rem;
-        display: flex;
+        font-size: 0.9rem;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+        box-shadow: 0 1px 6px rgba(0,0,0,0.1);
         transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.3s ease;
         outline: none;
+        /* positioned by JS; fallback if JS fails */
+        position: fixed;
+        top: 18px;
+        right: 16px;
+        z-index: 99999;
+        margin: 0 2px;
       }
       #theme-toggle:hover {
         transform: scale(1.12);
-        box-shadow: 0 4px 20px rgba(99, 102, 241, 0.35);
+        box-shadow: 0 3px 14px rgba(99, 102, 241, 0.3);
       }
       html.dark #theme-toggle {
-        background: rgba(30, 41, 59, 0.92);
-        border-color: rgba(148, 163, 184, 0.25);
-        box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+        background: rgba(30, 41, 59, 0.9) !important;
+        border-color: rgba(148, 163, 184, 0.3) !important;
+        box-shadow: 0 1px 6px rgba(0,0,0,0.4) !important;
+        color: #e2e8f0 !important;
+      }
+      /* When button is inside the nav pill, switch to relative */
+      #theme-toggle.in-nav {
+        position: relative;
+        top: auto;
+        right: auto;
+        z-index: auto;
       }
       #theme-toggle .t-icon { line-height: 1; pointer-events: none; }
-      /* tiny mode indicator dot */
+      /* tiny tooltip on hover */
       #theme-toggle::after {
         content: attr(data-mode);
         position: absolute;
-        bottom: -6px;
+        top: calc(100% + 6px);
         left: 50%;
         transform: translateX(-50%);
         font-size: 9px;
@@ -246,10 +285,12 @@
         color: #6366f1;
         background: white;
         border-radius: 4px;
-        padding: 0 3px;
+        padding: 1px 4px;
         opacity: 0;
+        pointer-events: none;
         transition: opacity 0.2s;
         white-space: nowrap;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.15);
       }
       html.dark #theme-toggle::after { background: #1e293b; color: #a5b4fc; }
       #theme-toggle:hover::after { opacity: 1; }
