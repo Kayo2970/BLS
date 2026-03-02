@@ -522,6 +522,109 @@
         }
       }
 
+      /* ══════════════════════════════════════════════════
+         INDIAN FLAG TRICOLOR — always prominent
+         ══════════════════════════════════════════════════
+         The HN component renders three animated gradient bands
+         (saffron → white → green) rotated -45° across the hero.
+         Three things suppress them — we fix all three:
+           1. bg-slate-50 on the root div competes with white
+           2. opacity-60 on the tricolor container is too faint
+           3. bg-white/30 + backdrop-blur-[1px] white-wash kills the stripes
+      */
+
+      /* 1 — Remove the slate base so gradients sit on pure white */
+      header#home .bg-slate-50 {
+        background-color: transparent !important;
+      }
+
+      /* 2 — Lift tricolor opacity from 0.6 → 0.82 on all screens */
+      header#home .bg-slate-50 > div:first-child {
+        opacity: 0.82 !important;
+      }
+
+      /* 3 — Halve the white-wash overlay so stripes breathe */
+      header#home .bg-slate-50 > div:last-child {
+        background: rgba(255, 255, 255, 0.12) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+      }
+
+      /* ── Mobile (< 768px): maximum punch ──────────────── */
+      @media (max-width: 767px) {
+        /* Full saturation on mobile — flag must read at a glance */
+        header#home .bg-slate-50 > div:first-child {
+          opacity: 0.95 !important;
+        }
+
+        /* Saffron band: cut blur from 120px → 45px so colour is vivid */
+        header#home .bg-slate-50 > div:first-child > div:first-child {
+          filter: blur(45px) !important;
+        }
+
+        /* White band: keep soft but tighten slightly */
+        header#home .bg-slate-50 > div:first-child > div:nth-child(2) {
+          filter: blur(70px) !important;
+        }
+
+        /* Green band: cut blur from 120px → 45px so colour is vivid */
+        header#home .bg-slate-50 > div:first-child > div:nth-child(3) {
+          filter: blur(45px) !important;
+        }
+
+        /* Nearly remove the white-wash on mobile — just a ghost */
+        header#home .bg-slate-50 > div:last-child {
+          background: rgba(255, 255, 255, 0.04) !important;
+          backdrop-filter: none !important;
+          -webkit-backdrop-filter: none !important;
+        }
+
+        /* Also make the header bg transparent so gradient sits on plain white */
+        header#home {
+          background-color: transparent !important;
+        }
+      }
+
+      /* ── Tablet (768px–1023px): moderate enhancement ───── */
+      @media (min-width: 768px) and (max-width: 1023px) {
+        header#home .bg-slate-50 > div:first-child {
+          opacity: 0.88 !important;
+        }
+        /* Saffron */
+        header#home .bg-slate-50 > div:first-child > div:first-child {
+          filter: blur(75px) !important;
+        }
+        /* Green */
+        header#home .bg-slate-50 > div:first-child > div:nth-child(3) {
+          filter: blur(75px) !important;
+        }
+        header#home .bg-slate-50 > div:last-child {
+          background: rgba(255, 255, 255, 0.08) !important;
+          backdrop-filter: none !important;
+          -webkit-backdrop-filter: none !important;
+        }
+      }
+
+      /* ── Desktop (1024px+): subtle lift from the original ─ */
+      @media (min-width: 1024px) {
+        header#home .bg-slate-50 > div:first-child {
+          opacity: 0.84 !important;
+        }
+        /* Saffron */
+        header#home .bg-slate-50 > div:first-child > div:first-child {
+          filter: blur(95px) !important;
+        }
+        /* Green */
+        header#home .bg-slate-50 > div:first-child > div:nth-child(3) {
+          filter: blur(95px) !important;
+        }
+        header#home .bg-slate-50 > div:last-child {
+          background: rgba(255, 255, 255, 0.10) !important;
+          backdrop-filter: none !important;
+          -webkit-backdrop-filter: none !important;
+        }
+      }
+
       /* ── Nav: always-visible logo ─────────────────────── */
       /*
        * React hides the logo when the user hasn't scrolled:
