@@ -114,6 +114,14 @@
         background-image: linear-gradient(to right, rgba(148, 163, 184, 0.1) 1px, transparent 1px),
                           linear-gradient(to bottom, rgba(148, 163, 184, 0.1) 1px, transparent 1px);
       }
+      /* Hero: zero out the grid pattern at source so nothing can restore it */
+      header#home .bg-grid-slate {
+        background-image: none !important;
+        background: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        display: none !important;
+      }
 
       .text-gradient {
         background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
@@ -169,6 +177,13 @@
       html.dark .bg-grid-slate {
         background-image: linear-gradient(to right, rgba(148,163,184,0.05) 1px, transparent 1px),
                           linear-gradient(to bottom, rgba(148,163,184,0.05) 1px, transparent 1px);
+      }
+      html.dark header#home .bg-grid-slate {
+        background-image: none !important;
+        background: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        display: none !important;
       }
       html.dark .text-gradient {
         background: linear-gradient(135deg, #60a5fa 0%, #22d3ee 100%);
@@ -540,22 +555,20 @@
 
       /* ── A. KILL BOTH GRID LAYERS IN THE HERO ─────────── */
       /*
-       * There are TWO grid layers:
-       *  1. div.bg-grid-slate  — outer grid, defined by .bg-grid-slate CSS class
-       *  2. HN's 2nd child     — inner grid inside the gradient component, using
-       *                          inline Tailwind arbitrary bg-[linear-gradient(...)]
-       *                          with a radial mask (visible in center of hero).
-       *     This second one is what shows through now that bg-slate-50 is transparent.
+       * Outer grid (.bg-grid-slate): also zeroed at source above.
+       * Inner grid (HN's 2nd child): inline Tailwind arbitrary
+       *   bg-[linear-gradient(...)] with radial mask — rendered
+       *   ABOVE the tricolor bands (later DOM order = higher z).
+       * Attack with every property so no cascade path can restore it.
        */
-
-      /* Outer grid */
-      header#home .bg-grid-slate {
-        display: none !important;
-      }
-
-      /* Inner grid (2nd child of HN's bg-slate-50 root div) */
       header#home .bg-slate-50 > div:nth-child(2) {
+        background-image: none !important;
+        background: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
         display: none !important;
+        -webkit-mask-image: none !important;
+        mask-image: none !important;
       }
 
       /* ── B. BASE (all modes, all sizes) ───────────────── */
