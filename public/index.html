@@ -153,9 +153,19 @@
         animation: scan 2s linear infinite;
       }
 
-      /* ── Images: show face at top ────────────────────── */
+      /* ── Images: show face at top, never distort ──────── */
       img.portrait-grayscale {
-        object-position: top center;
+        object-fit: cover !important;
+        object-position: top center !important;
+        width: 100% !important;
+        height: 100% !important;
+      }
+
+      /* ── Committee photo containers: portrait aspect ratio */
+      [id="organizing-committee"] .relative.overflow-hidden.rounded-2xl,
+      [id="executive-council"] .relative.overflow-hidden.rounded-2xl {
+        aspect-ratio: 3 / 4 !important;
+        height: auto !important;
       }
 
       /* ══════════════════════════════════════════════════
@@ -756,6 +766,46 @@
       /* ── Widescreen image quality ──────────────────────── */
       @media (min-width: 1280px) {
         img { image-rendering: auto; }
+      }
+
+      /* ══════════════════════════════════════════════════
+         MOBILE MENU — BUG FIXES
+         ══════════════════════════════════════════════════
+
+         BUG: The gallery section's "Captured Moments" badge
+         sits at z-40 (absolute, no parent stacking context).
+         The mobile menu overlay is also z-40 (fixed). Since
+         the gallery renders later in DOM than the nav, its
+         z-40 content paints ON TOP of the mobile-menu z-40,
+         making the badge visible through the open menu.
+
+         FIX: Raise the mobile menu to z-index 45 — above the
+         gallery's z-40 elements but below the nav at z-50,
+         so the nav bar stays visible over the open drawer.
+      */
+      [class*="fixed"][class*="inset-0"][class*="md:hidden"][class*="backdrop-blur-xl"] {
+        z-index: 45 !important;
+      }
+
+      /* Dark mode: mobile menu needs a dark background.
+         The existing sub-menu rule [class*="bg-white"][class*="backdrop-blur-xl"]
+         already handles this for desktop dropdowns; explicitly
+         reinforce it for the full-screen mobile drawer so the
+         selector is unambiguous. */
+      html.dark [class*="fixed"][class*="inset-0"][class*="md:hidden"][class*="backdrop-blur-xl"] {
+        background-color: rgba(10, 16, 32, 0.97) !important;
+      }
+
+      /* Dark mode: mobile menu "Download Brochure" button uses
+         bg-white which needs to become dark */
+      html.dark [class*="fixed"][class*="inset-0"][class*="md:hidden"] a[class*="border-slate-200"] {
+        background-color: rgba(30, 41, 59, 0.8) !important;
+        color: #e2e8f0 !important;
+      }
+
+      /* Dark mode: expand/collapse chevron pills in mobile menu */
+      html.dark [class*="fixed"][class*="inset-0"][class*="md:hidden"] button[class*="bg-slate-50"] {
+        background-color: rgba(30, 41, 59, 0.8) !important;
       }
     </style>
 
