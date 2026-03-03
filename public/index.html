@@ -538,8 +538,23 @@
             trigger browser rasterisation on every frame.
       */
 
-      /* ── A. KILL THE GRID IN THE HERO ─────────────────── */
+      /* ── A. KILL BOTH GRID LAYERS IN THE HERO ─────────── */
+      /*
+       * There are TWO grid layers:
+       *  1. div.bg-grid-slate  — outer grid, defined by .bg-grid-slate CSS class
+       *  2. HN's 2nd child     — inner grid inside the gradient component, using
+       *                          inline Tailwind arbitrary bg-[linear-gradient(...)]
+       *                          with a radial mask (visible in center of hero).
+       *     This second one is what shows through now that bg-slate-50 is transparent.
+       */
+
+      /* Outer grid */
       header#home .bg-grid-slate {
+        display: none !important;
+      }
+
+      /* Inner grid (2nd child of HN's bg-slate-50 root div) */
+      header#home .bg-slate-50 > div:nth-child(2) {
         display: none !important;
       }
 
