@@ -527,101 +527,151 @@
          ══════════════════════════════════════════════════
          The HN component renders three animated gradient bands
          (saffron → white → green) rotated -45° across the hero.
-         Three things suppress them — we fix all three:
-           1. bg-slate-50 on the root div competes with white
-           2. opacity-60 on the tricolor container is too faint
-           3. bg-white/30 + backdrop-blur-[1px] white-wash kills the stripes
+
+         ISSUES FIXED:
+         A. Grid/checkerboard: making bg-slate-50 transparent exposed
+            the bg-grid-slate layer underneath → hide it entirely.
+         B. Dark mode washed out: gradient needs saturate+brightness
+            boost against a dark canvas.
+         C. Flickering: animated blur divs need GPU compositor layers
+            (translateZ + will-change) so opacity/scale changes don't
+            trigger browser rasterisation on every frame.
       */
 
-      /* 1 — Remove the slate base so gradients sit on pure white */
+      /* ── A. KILL THE GRID IN THE HERO ─────────────────── */
+      header#home .bg-grid-slate {
+        display: none !important;
+      }
+
+      /* ── B. BASE (all modes, all sizes) ───────────────── */
+
+      /* Remove competing grey base from HN wrapper */
       header#home .bg-slate-50 {
         background-color: transparent !important;
       }
 
-      /* 2 — Lift tricolor opacity from 0.6 → 0.82 on all screens */
+      /* GPU-promote the animated gradient divs — prevents flicker */
+      header#home .bg-slate-50 > div:first-child,
+      header#home .bg-slate-50 > div:first-child > div {
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        will-change: transform, opacity;
+        isolation: isolate;
+      }
+
+      /* Lift tricolor opacity: 0.60 → 0.82 */
       header#home .bg-slate-50 > div:first-child {
         opacity: 0.82 !important;
       }
 
-      /* 3 — Halve the white-wash overlay so stripes breathe */
+      /* Thin white-wash to let stripes breathe */
       header#home .bg-slate-50 > div:last-child {
-        background: rgba(255, 255, 255, 0.12) !important;
+        background: rgba(255, 255, 255, 0.10) !important;
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
       }
 
-      /* ── Mobile (< 768px): maximum punch ──────────────── */
-      @media (max-width: 767px) {
-        /* Full saturation on mobile — flag must read at a glance */
-        header#home .bg-slate-50 > div:first-child {
-          opacity: 0.95 !important;
-        }
+      /* ── C. DARK MODE (all sizes) ─────────────────────── */
 
-        /* Saffron band: cut blur from 120px → 45px so colour is vivid */
+      /* Boost opacity on dark canvas */
+      html.dark header#home .bg-slate-50 > div:first-child {
+        opacity: 0.92 !important;
+      }
+      /* Saffron — saturate so it punches through dark bg */
+      html.dark header#home .bg-slate-50 > div:first-child > div:first-child {
+        filter: blur(90px) saturate(1.9) brightness(1.15) !important;
+      }
+      /* White middle band → dark gap between saffron and green */
+      html.dark header#home .bg-slate-50 > div:first-child > div:nth-child(2) {
+        background: rgba(6, 13, 26, 0.25) !important;
+        filter: blur(80px) !important;
+      }
+      /* Green — saturate for dark bg */
+      html.dark header#home .bg-slate-50 > div:first-child > div:nth-child(3) {
+        filter: blur(90px) saturate(1.9) brightness(1.15) !important;
+      }
+      /* White-wash → near-zero on dark mode */
+      html.dark header#home .bg-slate-50 > div:last-child {
+        background: rgba(6, 13, 26, 0.04) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+      }
+
+      /* ── MOBILE < 768px ────────────────────────────────── */
+      @media (max-width: 767px) {
+        /* Keep header bg plain so gradient is the only background */
+        header#home { background-color: transparent !important; }
+
+        header#home .bg-slate-50 > div:first-child { opacity: 0.95 !important; }
+
+        /* Cut blur right down — 120px at phone width = colour soup */
         header#home .bg-slate-50 > div:first-child > div:first-child {
           filter: blur(45px) !important;
         }
-
-        /* White band: keep soft but tighten slightly */
         header#home .bg-slate-50 > div:first-child > div:nth-child(2) {
-          filter: blur(70px) !important;
+          filter: blur(55px) !important;
         }
-
-        /* Green band: cut blur from 120px → 45px so colour is vivid */
         header#home .bg-slate-50 > div:first-child > div:nth-child(3) {
           filter: blur(45px) !important;
         }
-
-        /* Nearly remove the white-wash on mobile — just a ghost */
         header#home .bg-slate-50 > div:last-child {
           background: rgba(255, 255, 255, 0.04) !important;
           backdrop-filter: none !important;
           -webkit-backdrop-filter: none !important;
         }
 
-        /* Also make the header bg transparent so gradient sits on plain white */
-        header#home {
-          background-color: transparent !important;
+        /* Dark mode mobile: maximum vivid */
+        html.dark header#home .bg-slate-50 > div:first-child { opacity: 0.98 !important; }
+        html.dark header#home .bg-slate-50 > div:first-child > div:first-child {
+          filter: blur(45px) saturate(2.2) brightness(1.3) !important;
+        }
+        html.dark header#home .bg-slate-50 > div:first-child > div:nth-child(2) {
+          background: rgba(6, 13, 26, 0.20) !important;
+          filter: blur(55px) !important;
+        }
+        html.dark header#home .bg-slate-50 > div:first-child > div:nth-child(3) {
+          filter: blur(45px) saturate(2.2) brightness(1.3) !important;
+        }
+        html.dark header#home .bg-slate-50 > div:last-child {
+          background: rgba(6, 13, 26, 0.03) !important;
         }
       }
 
-      /* ── Tablet (768px–1023px): moderate enhancement ───── */
+      /* ── TABLET 768–1023px ─────────────────────────────── */
       @media (min-width: 768px) and (max-width: 1023px) {
-        header#home .bg-slate-50 > div:first-child {
-          opacity: 0.88 !important;
-        }
-        /* Saffron */
-        header#home .bg-slate-50 > div:first-child > div:first-child {
-          filter: blur(75px) !important;
-        }
-        /* Green */
-        header#home .bg-slate-50 > div:first-child > div:nth-child(3) {
-          filter: blur(75px) !important;
-        }
+        header#home .bg-slate-50 > div:first-child { opacity: 0.88 !important; }
+        header#home .bg-slate-50 > div:first-child > div:first-child { filter: blur(75px) !important; }
+        header#home .bg-slate-50 > div:first-child > div:nth-child(3) { filter: blur(75px) !important; }
         header#home .bg-slate-50 > div:last-child {
-          background: rgba(255, 255, 255, 0.08) !important;
+          background: rgba(255, 255, 255, 0.07) !important;
           backdrop-filter: none !important;
           -webkit-backdrop-filter: none !important;
         }
+        html.dark header#home .bg-slate-50 > div:first-child > div:first-child {
+          filter: blur(75px) saturate(2.0) brightness(1.2) !important;
+        }
+        html.dark header#home .bg-slate-50 > div:first-child > div:nth-child(3) {
+          filter: blur(75px) saturate(2.0) brightness(1.2) !important;
+        }
       }
 
-      /* ── Desktop (1024px+): subtle lift from the original ─ */
+      /* ── DESKTOP 1024px+ ───────────────────────────────── */
       @media (min-width: 1024px) {
-        header#home .bg-slate-50 > div:first-child {
-          opacity: 0.84 !important;
-        }
-        /* Saffron */
-        header#home .bg-slate-50 > div:first-child > div:first-child {
-          filter: blur(95px) !important;
-        }
-        /* Green */
-        header#home .bg-slate-50 > div:first-child > div:nth-child(3) {
-          filter: blur(95px) !important;
-        }
+        header#home .bg-slate-50 > div:first-child { opacity: 0.84 !important; }
+        header#home .bg-slate-50 > div:first-child > div:first-child { filter: blur(95px) !important; }
+        header#home .bg-slate-50 > div:first-child > div:nth-child(3) { filter: blur(95px) !important; }
         header#home .bg-slate-50 > div:last-child {
           background: rgba(255, 255, 255, 0.10) !important;
           backdrop-filter: none !important;
           -webkit-backdrop-filter: none !important;
+        }
+        html.dark header#home .bg-slate-50 > div:first-child > div:first-child {
+          filter: blur(95px) saturate(1.9) brightness(1.15) !important;
+        }
+        html.dark header#home .bg-slate-50 > div:first-child > div:nth-child(3) {
+          filter: blur(95px) saturate(1.9) brightness(1.15) !important;
         }
       }
 
