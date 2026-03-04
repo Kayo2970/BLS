@@ -923,5 +923,81 @@
 </head>
   <body>
     <div id="root"></div>
+
+  <!-- ── Location → Google Maps  |  Date → Google Calendar ── -->
+  <script>
+  (function () {
+    var MAPS_URL = 'https://www.google.com/maps/search/Ramaiah+University+of+Applied+Sciences+Bengaluru';
+    var CAL_URL  = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
+                 + '&text=Bharat+Lead+Summit+2026'
+                 + '&dates=20260410%2F20260412'
+                 + '&details=Bharat+Lead+Summit+2026+%E2%80%93+The+Stage+for+Sustainable+Leadership%0AHosted+at+Ramaiah+University+of+Applied+Sciences%2C+Bengaluru.'
+                 + '&location=Ramaiah+University+of+Applied+Sciences%2C+New+BEL+Rd%2C+MSR+Nagar%2C+Mathikere%2C+Bengaluru%2C+Karnataka+560054';
+
+    /* Walk text nodes inside root and return their parent elements */
+    function findByText(root, re) {
+      var results = [];
+      var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      var n;
+      while ((n = walker.nextNode())) {
+        if (re.test(n.textContent)) {
+          var el = n.parentElement;
+          if (el && results.indexOf(el) === -1) results.push(el);
+        }
+      }
+      return results;
+    }
+
+    /* Attach a click-to-open-URL behaviour to an element */
+    function attach(el, url, tipText) {
+      if (el.dataset.blsLink) return;                    // already processed
+      if (el.closest('a, button, [role="button"]')) return; // already interactive
+      el.dataset.blsLink = '1';
+      el.style.cursor = 'pointer';
+      el.style.textDecorationLine  = 'underline';
+      el.style.textDecorationStyle = 'dotted';
+      el.style.textUnderlineOffset = '3px';
+      el.title = tipText;
+      el.addEventListener('click', function (e) {
+        // Only fire if user clicked directly on a non-link child
+        if (!e.target.closest('a, button')) {
+          window.open(url, '_blank', 'noopener,noreferrer');
+        }
+      });
+    }
+
+    function run() {
+      var root = document.getElementById('root');
+      if (!root || !root.children.length) return;
+
+      /* Location text → Google Maps */
+      findByText(root, /Ramaiah University/i).forEach(function (el) {
+        attach(el, MAPS_URL, '📍 Click to open in Google Maps');
+      });
+
+      /* Date text (April 10 / April 11 / April 10 – 11) → Google Calendar */
+      findByText(root, /April\s+1[01]/i).forEach(function (el) {
+        if (el.textContent.trim().length < 120) {   // skip long paragraphs
+          attach(el, CAL_URL, '📅 Click to add to Google Calendar');
+        }
+      });
+    }
+
+    /* Debounced MutationObserver so we re-run after every React render */
+    var timer;
+    var observer = new MutationObserver(function () {
+      clearTimeout(timer);
+      timer = setTimeout(run, 250);
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var root = document.getElementById('root');
+      if (root) observer.observe(root, { childList: true, subtree: true });
+      /* Also run after initial React mount (500 ms) and after lazy chunks (2.5 s) */
+      setTimeout(run, 500);
+      setTimeout(run, 2500);
+    });
+  })();
+  </script>
 </body>
 </html>
